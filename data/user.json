@@ -1,9 +1,11 @@
 {
-    "name": "Kiaora",
-    "avatar": "26",
-    "ownedCards" : [{
-        "id": "a1-002",
-        "rarity": "◊",
-        "quantity": 1
-    }]
+  "name": "Kiaora",
+  "avatar": "26",
+  "myCards": [
+    {
+      "id": "a1-002",
+      "rarity": "◊",
+      "quantity": 1
+    }
+  ]
 }

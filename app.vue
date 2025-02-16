@@ -1,7 +1,9 @@
 <template>
+  <CardDetail />
+
   <div class="container-background">
     <div class="container-actions">
-      <h2>{{ user.name }}'s Cards</h2>
+      <h2>{{ userStore.user.name }}'s Cards</h2>
       <div class="avatar">
         <div class="avatar-border">
           <img :src="avatar" alt="Avatar" class="avatar-img" />
@@ -49,13 +51,31 @@
         <div
           v-for="card in pack.cards"
           :key="card.id"
-          :class="[{ 'cards-margin': user.ownedCards.includes(card.id) }]"
           style="position: relative"
         >
-          <img :src="card.image" :alt="card.name" class="card-img" />
-          <span class="counter-card">3</span>
-          <!-- <img v-if="user.ownedCards.includes(card.id)" :src="card.image" :alt="card.name" class="card-img">
-          <div v-else class="empty-card"><span>{{cleanNumber(card.id)}}</span></div> -->
+          <!-- @click="store.openDetails(card)" -->
+          <!-- <img :src="card.image" :alt="card.name" class="card-img" /> -->
+          <div v-if="userStore.hasCard(card)">
+            <img :src="card.image" :alt="card.name" class="card-img" />
+            <span class="counter-card">{{
+              userStore.getCardQuantity(card)
+            }}</span>
+          </div>
+          <div v-else class="empty-card">
+            <span>{{ cleanNumber(card.id) }}</span>
+          </div>
+          <div class="edit-cards">
+            <div class="edit-buttons">
+              <button
+                class="button-remove"
+                @click="userStore.remove(card)"
+              ></button>
+              <button class="button-add" @click="userStore.add(card)"></button>
+            </div>
+            <div class="counter-edit" v-if="userStore.hasCard(card)">
+              <span>{{ formattNumber(userStore.getCardQuantity(card)) }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -84,24 +104,32 @@
 </template>
 
 <script setup>
-import user from '~/data/user.json';
 import geneticApex from '~/public/img/genetic-apex.png';
 import mythicalIsland from '~/public/img/mythical-island.png';
 import promoA from '~/public/img/promo-a.png';
 import spaceTimeSmackdown from '~/public/img/space-time-smackdown.png';
 import star from '~/public/img/star.png';
 import cardsByPack from '~/data';
+import { useCardDetailStore } from '~/stores/cardDetail';
+import { useUserStore } from '~/stores/user';
+
+const userStore = useUserStore();
+
+console.log(userStore);
 
 const avatar = computed(
   () =>
-    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${user.avatar}.svg`,
+    `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${userStore.user.avatar}.svg`,
 );
 
-// "eslint-config-prettier": "^8.5.0",
-// "eslint-plugin-html": "^6.2.0",
-// "eslint-plugin-prettier": "^5.0.0",
-// "eslint-plugin-vue": "^9.23.0",
-const a = 1;
+function cleanNumber(number) {
+  return number.split('-')[1];
+}
+
+function formattNumber(number) {
+  console.log(number);
+  return number.toString().padStart(2, '0');
+}
 </script>
 
 <style>
@@ -158,6 +186,7 @@ body {
   } */
 .container {
   padding: 1.3rem;
+  width: calc(100vw - 1.3rem);
   max-width: 800px;
   flex-wrap: wrap; /* Permite ajuste automático */
 }
@@ -170,9 +199,9 @@ body {
   max-width: 100%;
 }
 
-.cards-margin {
+/* .cards-margin {
   margin-bottom: 0.2rem;
-}
+} */
 
 .card-img {
   width: 100%;
@@ -185,13 +214,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  aspect-ratio: 0.72; /* Mantém a proporção */
+  aspect-ratio: 0.69; /* Mantém a proporção */
   width: 100%; /* Ocupa a coluna */
   background: #e6eff6;
   border-radius: 5px;
   box-shadow:
     inset 3px 3px 3px rgb(204, 218, 234),
     inset -4px -4px 5px rgba(255, 255, 255);
+  cursor: pointer;
 }
 
 /* Responsividade */
@@ -392,6 +422,7 @@ body {
   text-align: center;
   display: flex;
   justify-content: center;
+  z-index: 1;
 }
 
 .footer-grid {
@@ -442,5 +473,77 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+.edit-buttons {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  width: 88%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #8a9ab2;
+  border-radius: 2rem;
+  box-shadow: inset 2px 3px 2px rgb(204, 218, 234);
+}
+/* .edit-buttons button {
+  font-size: 28px;
+  font-weight: 200;
+} */
+.button-remove {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  padding: calc(0.3rem + 12%) 23% calc(0.3rem + 12%) 23%;
+  border-radius: 2rem 0 0 2rem;
+  position: relative;
+  cursor: pointer;
+}
+.button-remove::after {
+  content: '_';
+  position: absolute;
+  font-size: 23px;
+  font-weight: 200;
+  left: 38%;
+  bottom: 41%;
+}
+.button-add {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  padding: calc(0.3rem + 12%) 23% calc(0.3rem + 12%) 23%;
+  border-radius: 0 2rem 2rem 0;
+  position: relative;
+  border-left: 1px solid;
+  cursor: pointer;
+}
+.button-add::after {
+  content: '+';
+  position: absolute;
+  font-size: 25px;
+  font-weight: 200;
+  right: 38%;
+  bottom: 50%;
+  transform: translate(25%, 50%);
+}
+.counter-edit {
+  position: absolute;
+  width: 100%;
+  bottom: 51%;
+  font-size: calc(1rem + 2.5vw);
+  font-weight: bold;
+  color: white;
+  display: flex;
+  justify-content: center;
+}
+.edit-cards {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-color: #00000052;
+  border-radius: 5px;
 }
 </style>
