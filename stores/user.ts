@@ -22,14 +22,13 @@ export const useUserStore = defineStore('user', {
     user: {
       name: 'SemParar',
       avatar: 26,
-      myCards: {} as Cards,
-      // myCards: {
-      //   'a1-002': {
-      //     id: 'a1-002',
-      //     rarity: '◊',
-      //     quantity: 1,
-      //   },
-      // } as Cards,
+      myCards: {
+        'a1-002': {
+          id: 'a1-002',
+          rarity: '◊',
+          quantity: 1,
+        },
+      } as Cards,
     },
   }),
   actions: {

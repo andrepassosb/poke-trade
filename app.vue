@@ -115,8 +115,6 @@ import { useUserStore } from '~/stores/user';
 
 const userStore = useUserStore();
 
-console.log(userStore);
-
 const avatar = computed(
   () =>
     `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/${userStore.user.avatar}.svg`,
@@ -127,7 +125,6 @@ function cleanNumber(number) {
 }
 
 function formattNumber(number) {
-  console.log(number);
   return number.toString().padStart(2, '0');
 }
 </script>
